@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART HOME - IoT Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: radial-gradient(circle at center, #111a28 0%, #06090e 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #1a1e29;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.05);
+            border: 1px solid #2a3143;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            color: #00f0ff;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 20px rgba(0, 240, 255, 0.4);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #a0aec0;
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        .channel-card {
+            background-color: #242a38;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .channel-info {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .icon {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        /* ส่วนของ Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #3b4252;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #00f0ff;
+            box-shadow: 0 0 15px #00f0ff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .footer .highlight {
+            color: #00f0ff;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">SMART HOME</h1>
+            <div class="subtitle">ESP8266 IoT Control Panel</div>
+        </div>
+
+        <div class="channel-card">
+            <div class="channel-info">
+                <span class="icon">💡</span>
+                <span>ช่องที่ 1 (D1)</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="ch1" onchange="toggleDevice('ch1', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="channel-card">
+            <div class="channel-info">
+                <span class="icon">🔌</span>
+                <span>ช่องที่ 2 (D2)</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="ch2" onchange="toggleDevice('ch2', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="channel-card">
+            <div class="channel-info">
+                <span class="icon">📺</span>
+                <span>ช่องที่ 3 (D5)</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="ch3" onchange="toggleDevice('ch3', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="channel-card">
+            <div class="channel-info">
+                <span class="icon">❄️</span>
+                <span>ช่องที่ 4 (D6)</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="ch4" onchange="toggleDevice('ch4', this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="footer">
+            <span class="highlight">ผู้พัฒนาระบบ</span><br>
+            ครูวิทยากร วรรณา<br>
+            แผนกอิเล็กทรอนิกส์<br>
+            วิทยาลัยสารพัดช่างศรีสะเกษ
+        </div>
+    </div>
+
+    <script type="module">
+        // 1. นำเข้าคำสั่งที่จำเป็นจาก Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // 2. นำค่า Firebase Config ของคุณมาวางแทนที่ตรงนี้
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // 3. เริ่มต้นการเชื่อมต่อ Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 4. ฟังก์ชันสำหรับส่งคำสั่งเปิด/ปิดไปที่ Firebase
+        // เราทำฟังก์ชันนี้ให้เรียกใช้ได้จาก HTML (ผ่าน object window)
+        window.toggleDevice = function(channel, isChecked) {
+            // โครงสร้างฐานข้อมูลจะเป็น devices -> ch1 : true/false
+            const deviceRef = ref(db, 'devices/' + channel);
+            set(deviceRef, isChecked)
+                .then(() => {
+                    console.log(`ส่งคำสั่ง ${channel} สถานะ: ${isChecked} สำเร็จ`);
+                })
+                .catch((error) => {
+                    console.error("เกิดข้อผิดพลาด: ", error);
+                });
+        };
+
+        // 5. อ่านสถานะปัจจุบันจาก Firebase เพื่อมาอัปเดตสวิตช์ตอนโหลดหน้าเว็บ (Real-time)
+        const channels = ['ch1', 'ch2', 'ch3', 'ch4'];
+        channels.forEach((channel) => {
+            const deviceRef = ref(db, 'devices/' + channel);
+            onValue(deviceRef, (snapshot) => {
+                const state = snapshot.val();
+                if (state !== null) {
+                    // ปรับสวิตช์บนหน้าจอให้ตรงกับค่าใน Database
+                    document.getElementById(channel).checked = state;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
